@@ -51,7 +51,7 @@ void draw()
   bpm.run();
   println(bpm.getBPM());
 }
-
+ 
 void backgroundSetter(){
   if(millis() - backgroundTimer > backgroundInterval){
     background(0); //another setting that can be turned on or off based on beat detection
