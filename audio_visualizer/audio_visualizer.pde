@@ -33,14 +33,15 @@ void setup()
 
 void draw()
 {
-  cameraZoom = cameraZoom + map(bpm.getBPM(), 1.0, 8.0, -10.0, 5.0);
+  cameraZoom = cameraZoom + map(bpm.getBPM(), 1.0, 7.0, -10.0, 5.0);
   speed = map(bpm.getBPM(), 1.0, 5.0, 0.1, 10.0);
-  sizeScale = map(bpm.getBPM(), 1.0, 5.0, 1.0, 5.0);
+  sizeScale = map(bpm.getBPM(), 1.0, 5.0, 1.0, 2.0);
   colorScale = map(bpm.getBPM(), 1.0, 10.0, -10.0, 90.0);
   backgroundSetter();
   fft.forward(in.mix);
   doubleAtomicSprocket();
   bpm.run();
+  println(bpm.getBPM());
 }
 
 void backgroundSetter() {
@@ -149,7 +150,7 @@ class BeatsPerMinute {
   }
 
   void run() {
-    if ( beat.isHat() || beat.isSnare() || beat.isKick() || beat.isOnset()) {
+    if ( beat.isHat() || beat.isSnare() || beat.isKick()) {// || beat.isOnset()) {
       numberOfBeatsDetected++;
     }
     if (millis() - timer > beatCheckInterval) {
