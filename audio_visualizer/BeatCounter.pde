@@ -19,7 +19,7 @@ class BeatCounter {
       numberOfBeatsDetected++;
     }
     if (millis() - timer > beatCheckInterval) {
-      if (currentBPM < lastBPM) lastBPM=lastBPM-0.15;
+      if (currentBPM < lastBPM) lastBPM=lastBPM-0.25;
       else if (currentBPM >= lastBPM) lastBPM = currentBPM;
       currentBPM = numberOfBeatsDetected;
       numberOfBeatsDetected = 0;
