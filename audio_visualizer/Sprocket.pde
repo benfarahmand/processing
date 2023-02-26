@@ -34,22 +34,22 @@ class Sprocket {
         centerColor[0] = 0.0;
         centerColor[1] = 15.0;
         centerColor[2] = 90.0;
-        modeTransitionTimer = millis();
+        modeTransitionTimer = millis()+10000.0;
     }
 
     void draw(){
-        modeTransitioner();
+        this.modeTransitioner();
         noStroke();
         pushMatrix();
         cameraTracker();
         translate(width/2, height/2, 0);
         for (int i = 0; i < myFFT.specSize(); i++) {
-            fill(colorChanger(i, true));
-            calculatePosition(i);
-            moveCube(i);
+            fill(this.colorChanger(i, true));
+            this.calculatePosition(i);
+            this.moveCube(i);
         }
         popMatrix();
-        modeTransitionTracker();
+        this.modeTransitionTracker();
     }
 
     void modeTransitionTracker(){
@@ -136,7 +136,7 @@ class Sprocket {
             else if (mode == 2){
                 pushMatrix();
                 translate(x[i], y[i], z[i]);
-                box((myFFT.getBand(i)+myFFT.getFreq(i))*sizeScale/10);
+                box((myFFT.getBand(i)+myFFT.getFreq(i))*sizeScale/10+1);
                 popMatrix();
             }
             else if (mode == 3){
@@ -205,10 +205,14 @@ class Sprocket {
     }
 
     void modeTransitioner(){
-        println(bpm.getBPM());
-        if(bpm.getBPM()<4.0){
+        // println(bpm.getBPM());
+        if(bpm.getBPM()<3.0){
+            // println((millis() - modeTransitionTimer));
             if(millis() - modeTransitionTimer > modeTransitionTimerDuration){
-                setMode(mode++);
+                if(!transitioning) {
+                    this.setMode(mode+1);
+                }
+                modeTransitionTimer = millis()+10000.0;
             }
         } else {
             modeTransitionTimer = millis();
