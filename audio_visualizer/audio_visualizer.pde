@@ -11,13 +11,11 @@ float[] y, x;
 float sizeScale = 1.0, colorScale = 1.0;
 float speed = 1.0;
 float[] centerColor;
-//float cameraTimer = 0.0;
 float cameraZoom = -250.0;
 
 void setup()
 {
   fullScreen(P3D);
-  //perspective();
   minim = new Minim(this);
   in = minim.getLineIn(Minim.MONO, 2048, 192000.0, 16);
   fft = new FFT(in.bufferSize(), in.sampleRate());
@@ -36,7 +34,6 @@ void setup()
 void draw()
 {
   cameraZoom = cameraZoom + map(bpm.getBPM(), 1.0, 8.0, -10.0, 5.0);
-  //println(cameraZoom);
   speed = map(bpm.getBPM(), 1.0, 5.0, 0.1, 10.0);
   sizeScale = map(bpm.getBPM(), 1.0, 5.0, 1.0, 5.0);
   colorScale = map(bpm.getBPM(), 1.0, 10.0, -10.0, 90.0);
@@ -71,10 +68,6 @@ void cameraTracker() {
   if (cameraZoom>500)cameraZoom=500;
   if (cameraZoom<-250)cameraZoom=-250;
   translate(0, 0, cameraZoom);
-  //if(millis() - cameraTimer > cameraInterval){
-  //  //do something with the camera
-  //  cameraTimer = millis();
-  //}
 }
 
 void doubleAtomicSprocket() {
@@ -99,9 +92,6 @@ void doubleAtomicSprocket() {
   cameraTracker();
   translate(width/2, height/2);
   for (int i = 0; i < fft.specSize(); i++) {
-    //y[i] = y[i] + fft.getBand(i)/100;
-    //x[i] = x[i] + fft.getFreq(i)/100;
-    //angle[i] = angle[i] + fft.getFreq(i)/2000*speed;
     rotateX(sin(angle[i]/2));
     rotateY(cos(angle[i]/2));
     fill(colorChanger(i, false));
