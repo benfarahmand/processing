@@ -4,7 +4,7 @@ import ddf.minim.*;
 Minim minim;
 FFT fft;
 AudioInput in;
-BeatsPerMinute bpm;
+BeatCounter bpm;
 
 float[] angle;
 float[] y, x;
@@ -19,7 +19,7 @@ void setup()
   minim = new Minim(this);
   in = minim.getLineIn(Minim.MONO, 2048, 192000.0, 16);
   fft = new FFT(in.bufferSize(), in.sampleRate());
-  bpm = new BeatsPerMinute();
+  bpm = new BeatCounter();
   y = new float[fft.specSize()];
   x = new float[fft.specSize()];
   angle = new float[fft.specSize()];
@@ -41,7 +41,7 @@ void draw()
   fft.forward(in.mix);
   doubleAtomicSprocket();
   bpm.run();
-  println(bpm.getBPM());
+  // println(bpm.getBPM());
 }
 
 void backgroundSetter() {
@@ -52,6 +52,7 @@ void backgroundSetter() {
   rect(-2*width, -2*height, 5*width, 5*height);
   popMatrix();
 }
+
 color colorChanger(int i, boolean b) {
   if (b) return color(
     map(fft.getFreq(i)*speed, 0, 512, 0, 360),
@@ -108,61 +109,4 @@ void stop()
 {
   minim.stop();
   super.stop();
-}
-
-class BeatListener implements AudioListener
-{
-  private BeatDetect beat;
-  private AudioInput source;
-
-  BeatListener(BeatDetect beat, AudioInput source)
-  {
-    this.source = source;
-    this.source.addListener(this);
-    this.beat = beat;
-  }
-
-  void samples(float[] samps)
-  {
-    beat.detect(source.mix);
-  }
-
-  void samples(float[] sampsL, float[] sampsR)
-  {
-    beat.detect(source.mix);
-  }
-}
-
-class BeatsPerMinute {
-  float beatCheckInterval = 500.0; //in millis
-  float timer = 0.0;
-  int numberOfBeatsDetected = 0;
-  BeatDetect beat;
-  BeatListener bl;
-  float lastBPM = 1.0, currentBPM = 1.0;
-
-  BeatsPerMinute() {
-    beat = new BeatDetect(in.bufferSize(), in.sampleRate());
-    beat.detectMode(BeatDetect.FREQ_ENERGY);
-    bl = new BeatListener(beat, in);
-    beat.setSensitivity(10);
-    timer = millis();
-  }
-
-  void run() {
-    if ( beat.isHat() || beat.isSnare() || beat.isKick()) {// || beat.isOnset()) {
-      numberOfBeatsDetected++;
-    }
-    if (millis() - timer > beatCheckInterval) {
-      if (currentBPM < lastBPM) lastBPM=lastBPM-0.15;
-      else if (currentBPM >= lastBPM) lastBPM = currentBPM;
-      currentBPM = numberOfBeatsDetected;
-      numberOfBeatsDetected = 0;
-      timer = millis();
-    }
-  }
-
-  float getBPM() {
-    return lastBPM;
-  }
 }
