@@ -10,6 +10,8 @@ class Sprocket {
     float myWidth, myHeight;
     float horizontalGridCubeSpacing, verticalGridCubeSpacing, gridVerticalIncrementer;
     float modeTransitionTimer = 0.0, modeTransitionTimerDuration = 2000.0; //if the beats are low for more than 3 seconds, switch the mode
+    //boundary condition for the gravity mode
+    float leftWall, rightWall, frontWall, backWall, topWall, bottomWall;
 
     Sprocket(FFT _fft){
         myFFT = _fft;
@@ -35,15 +37,25 @@ class Sprocket {
         centerColor[1] = 15.0;
         centerColor[2] = 90.0;
         modeTransitionTimer = millis()+10000.0;
+        leftWall = -myWidth/2;
+        rightWall = myWidth/2;
+        frontWall = -250;
+        backWall = 250;
+        topWall = -myHeight/2;
+        bottomWall = myHeight/2;
     }
 
     void draw(){
-        this.modeTransitioner();
+        // this.modeTransitioner();
         noStroke();
         pushMatrix();
         cameraTracker();
         translate(width/2, height/2, 0);
         for (int i = 0; i < myFFT.specSize(); i++) {
+            // if(i%4==0) fill(360,100,100);
+            // else if (i%4==1) fill(180,100,100);
+            // else if (i%4==2) fill(90,100,100);
+            // else if (i%4==3) fill(270,100,100);
             fill(this.colorChanger(i, true));
             this.calculatePosition(i);
             this.moveCube(i);
@@ -59,6 +71,9 @@ class Sprocket {
                 yf = new float[myFFT.specSize()];
                 xf = new float[myFFT.specSize()];
                 zf = new float[myFFT.specSize()];
+                vy = new float[myFFT.specSize()];
+                vx = new float[myFFT.specSize()];
+                vz = new float[myFFT.specSize()];
                 transitionalPositionIncrementer = 0.0;
                 transitioning = false;
             }
@@ -91,17 +106,22 @@ class Sprocket {
                 //gravity rules
                 float volumeAdjuster = myFFT.getBand(i)/10;
                 float massAdjuster = myFFT.getFreq(i);
-                float velocityDamp = 0.5;
+                float velocityDamp = 0.1;
                 for(int j = 0 ; j < myFFT.specSize() ; j++){
                     if(i!=j){
                         if(dist(x[i],y[i],z[i],x[j],y[j],z[j])<200){
                             vx[i] = vx[i] + (x[j] - x[i])*.00001*massAdjuster;
                             vy[i] = vy[i] + (y[j] - y[i])*.00001*massAdjuster;
                             vz[i] = vz[i] + (z[j] - z[i])*.00001*massAdjuster;
-                            // if(dist(x[i],y[i],z[i],x[j],y[j],z[j])<10){
-                            //     vx[i] = vx[i]*0.9 + (x[j] - x[i])*-.00001;
-                            //     vy[i] = vy[i]*0.9 + (y[j] - y[i])*-.00001;
-                            //     vz[i] = vz[i]*0.9 + (z[j] - z[i])*-.00001;
+                            // if(dist(x[i],y[i],z[i],x[j],y[j],z[j])<20){
+                            //     vx[i] = vx[i]*velocityDamp + (x[j] - x[i])*-.0001;
+                            //     vy[i] = vy[i]*velocityDamp + (y[j] - y[i])*-.0001;
+                            //     vz[i] = vz[i]*velocityDamp + (z[j] - z[i])*-.0001;
+                            //     if(dist(x[i],y[i],z[i],x[j],y[j],z[j])<15){
+                            //         vx[i] = vx[i] + (x[j] - x[i])*-1.1;
+                            //         vy[i] = vy[i] + (y[j] - y[i])*-1.1;
+                            //         vz[i] = vz[i] + (z[j] - z[i])*-1.1;
+                            //     }
                             // }
                         }
                     }
@@ -109,17 +129,123 @@ class Sprocket {
                 x[i] = x[i] + vx[i]*volumeAdjuster;
                 y[i] = y[i] + vy[i]*volumeAdjuster;
                 z[i] = z[i] + vz[i]*volumeAdjuster;
-                if(x[i]<-myWidth/2)vx[i]=-vx[i]*velocityDamp;
-                else if(x[i]>myWidth/2)vx[i]=-vx[i]*velocityDamp;
-                if(y[i]<-myHeight/2)vy[i]=-vy[i]*velocityDamp;
-                else if(y[i]>myHeight/2)vy[i]=-vy[i]*velocityDamp;
-                if(z[i]<-250)vz[i]=-vz[i]*velocityDamp;
-                else if(z[i]>250)vz[i]=-vz[i]*velocityDamp;
+                if(x[i]<leftWall){
+                    x[i]=leftWall;
+                    vx[i]=-vx[i]*velocityDamp;
+                }
+                else if(x[i]>rightWall){
+                    x[i]=rightWall;
+                    vx[i]=-vx[i]*velocityDamp;
+                }
+                if(y[i]<topWall){
+                    y[i]=topWall;
+                    vy[i]=-vy[i]*velocityDamp;
+                }
+                else if(y[i]>bottomWall){
+                    y[i]=bottomWall;
+                    vy[i]=-vy[i]*velocityDamp;
+                }
+                if(z[i]<frontWall){
+                    z[i]=frontWall;
+                    vz[i]=-vz[i]*velocityDamp;
+                }
+                else if(z[i]>backWall){
+                    z[i]=backWall;
+                    vz[i]=-vz[i]*velocityDamp;
+                }
             }
             else if (mode == 4){
                 //curtain in the wind rules
                 //or particles with connecting lines and instead color the lines and increase the line thickness
                 //based on the volume and stuff
+                float volumeAdjuster = myFFT.getBand(i)/10;
+                float massAdjuster = myFFT.getFreq(i)*2;
+                float velocityDamp = 0.0;
+                for(int j = 0 ; j < myFFT.specSize() ; j++){
+                    if(i!=j){
+                        if(i%4==0){  //creature zero
+                            if(j%4==0){
+                                creatureRule(i,j,300,0.05,massAdjuster,-0.9);//i, j, dist, str, adj
+                            } else if (i%4==1) { 
+                                creatureRule(i,j,150,0.1,massAdjuster,1.0);//i, j, dist, str, adj
+                            } else if (i%4==2) {
+                                creatureRule(i,j,500,-0.001,massAdjuster,-2.0);//i, j, dist, str, adj
+                            } else if (i%4==3) {
+                                creatureRule(i,j,400,1.2,massAdjuster,1.0);//i, j, dist, str, adj
+                            }
+                        } else if (i%4==1) { //creature one
+                            if(j%4==0){
+                                creatureRule(i,j,150,-0.01,massAdjuster,0.8);//i, j, dist, str, adj
+                            } else if (i%4==1) { 
+                                creatureRule(i,j,200,0.2,massAdjuster,-0.8);//i, j, dist, str, adj
+                            } else if (i%4==2) {
+                                creatureRule(i,j,500,0.1,massAdjuster,0.8);//i, j, dist, str, adj
+                            } else if (i%4==3) {
+                                creatureRule(i,j,150,0.01,massAdjuster,-1.0);//i, j, dist, str, adj
+                            }
+                        } else if (i%4==2) { //creature two
+                            if(j%4==0){
+                                creatureRule(i,j,1000,0.01,massAdjuster,1.0);//i, j, dist, str, adj
+                            } else if (i%4==1) { 
+                                creatureRule(i,j,1000,0.01,massAdjuster,1.0);//i, j, dist, str, adj
+                            } else if (i%4==2) {
+                                creatureRule(i,j,1000,0.05,massAdjuster,-0.92);//i, j, dist, str, adj
+                            } else if (i%4==3) {
+                                creatureRule(i,j,1000,0.01,massAdjuster,1.0);//i, j, dist, str, adj
+                            }
+                        } else if (i%4==3) { //creature three
+                            if(j%4==0){
+                                creatureRule(i,j,500,1.0,massAdjuster,-0.5);//i, j, dist, str, adj
+                            } else if (i%4==1) {
+                                creatureRule(i,j,50,-0.01,massAdjuster,1.0);//i, j, dist, str, adj
+                            } else if (i%4==2) {
+                                creatureRule(i,j,100,-0.0001,massAdjuster,1.0);//i, j, dist, str, adj
+                            } else if (i%4==3) {
+                                creatureRule(i,j,400,0.05,massAdjuster,-0.92);//i, j, dist, str, adj
+                            }
+                        }
+                    }
+                }
+                x[i] = x[i] + vx[i]*volumeAdjuster;
+                y[i] = y[i] + vy[i]*volumeAdjuster;
+                z[i] = z[i] + vz[i]*volumeAdjuster;
+                if(x[i]<leftWall){
+                    x[i]=random(leftWall,rightWall);
+                    vx[i]=vx[i]*velocityDamp;
+                }
+                else if(x[i]>rightWall){
+                    x[i]=random(leftWall,rightWall);
+                    vx[i]=vx[i]*velocityDamp;
+                }
+                if(y[i]<topWall){
+                    y[i]=random(topWall,bottomWall);;
+                    vy[i]=vy[i]*velocityDamp;
+                }
+                else if(y[i]>bottomWall){
+                    y[i]=random(topWall,bottomWall);;
+                    vy[i]=vy[i]*velocityDamp;
+                }
+                if(z[i]<frontWall){
+                    z[i]=random(frontWall,backWall);
+                    vz[i]=vz[i]*velocityDamp;
+                }
+                else if(z[i]>backWall){
+                    z[i]=random(frontWall,backWall);
+                    vz[i]=vz[i]*velocityDamp;
+                }
+            }
+        }
+    }
+
+    void creatureRule(int i, int j, float distance, float strength, float massAdjuster, float damp){
+        if(dist(x[i],y[i],z[i],x[j],y[j],z[j])<distance){
+            vx[i] = vx[i] + (x[j] - x[i])*strength*massAdjuster;
+            vy[i] = vy[i] + (y[j] - y[i])*strength*massAdjuster;
+            vz[i] = vz[i] + (z[j] - z[i])*strength*massAdjuster;
+            if(dist(x[i],y[i],z[i],x[j],y[j],z[j])<distance/10){
+                vx[i] = vx[i]*damp;
+                vy[i] = vy[i]*damp;
+                vz[i] = vz[i]*damp;
             }
         }
     }
@@ -136,13 +262,19 @@ class Sprocket {
             else if (mode == 2){
                 pushMatrix();
                 translate(x[i], y[i], z[i]);
-                box((myFFT.getBand(i)+myFFT.getFreq(i))*sizeScale/10+1);
+                box((myFFT.getBand(i)+myFFT.getFreq(i))*sizeScale/40);
                 popMatrix();
             }
             else if (mode == 3){
                 pushMatrix();
                 translate(x[i], y[i], z[i]);
                 sphere((myFFT.getBand(i)+myFFT.getFreq(i))*sizeScale/20+1);
+                popMatrix();
+            }
+            else if (mode == 4){
+                pushMatrix();
+                translate(x[i], y[i], z[i]);
+                sphere((myFFT.getBand(i)+myFFT.getFreq(i))*sizeScale/50+0.5);
                 popMatrix();
             }
     }
@@ -169,9 +301,14 @@ class Sprocket {
                 zf[i] = 0;
             }
             else if (mode == 3){
-                xf[i] = random(-myWidth/2,myWidth/2);
-                yf[i] = random(-myHeight/2,myHeight/2);
-                zf[i] = random(-100,100);
+                xf[i] = random(leftWall,rightWall);
+                yf[i] = random(topWall,bottomWall);
+                zf[i] = random(frontWall/2,backWall/2);
+            }
+            else if (mode == 4){
+                xf[i] = random(leftWall/2,rightWall/2);
+                yf[i] = random(topWall/2,bottomWall/2);
+                zf[i] = random(frontWall/4,backWall/4);
             }
             x[i] = lerp(x[i],xf[i],transitionalPositionIncrementer/totalTransitionIncrements);
             y[i] = lerp(y[i],yf[i],transitionalPositionIncrementer/totalTransitionIncrements);
@@ -183,7 +320,7 @@ class Sprocket {
     //so we need some counter that will keep track of how long automatically transition to another mode
     void setMode(int i){ 
         if(!transitioning){
-            if(i>3)i=1;
+            if(i>4)i=1;
             if (i != mode) {
                 transitioning = true;
             }

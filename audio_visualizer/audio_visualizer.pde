@@ -120,5 +120,7 @@ void keyPressed(){
     s.setMode(2);
   }else if(key == '3'){
     s.setMode(3);
+  }else if(key == '4'){
+    s.setMode(4);
   }
 }
