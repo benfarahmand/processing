@@ -13,7 +13,7 @@ class Sprocket {
     //boundary condition for the gravity mode
     float leftWall, rightWall, frontWall, backWall, topWall, bottomWall;
     PImage skullTop, skullBottom;
-    float mouthY = 0.0, mouthIncrementer = 0.0, mouthTotalIncrements = 10.0, skullAngle=0.0;
+    float mouthY = 0.0, lastMouthY = 0.0, mouthIncrementer = 0.0, mouthTotalIncrements = 5.0, skullAngle=0.0;
     float skullRotateTimer = 0.0, skullRotateStayStillDuration = 2000.0, rotateDirection = 1.0;
     boolean isSkullRotating = false;
     float skullEyesRadius = 20.0;
@@ -88,7 +88,7 @@ class Sprocket {
                 );
                 translate(0,-myWidth/10,bpm.getBPM()*10);
                 pushMatrix();
-                translate(0,skullTop.height/4+lerp(mouthY,avgFreq*10,mouthIncrementer/mouthTotalIncrements),-100);
+                translate(0,skullTop.height/4+lerp(lastMouthY,mouthY,mouthIncrementer/mouthTotalIncrements),-100);
                 beginShape();
                 texture(skullBottom);
                 vertex(-skullBottom.width/4, -skullBottom.height/4, 0, 0);
@@ -137,7 +137,8 @@ class Sprocket {
                 endShape();
                 if(mouthIncrementer>=mouthTotalIncrements){
                     mouthIncrementer=0.0;
-                    mouthY=avgFreq;
+                    lastMouthY = mouthY;
+                    mouthY=avgFreq*8;
                 } else mouthIncrementer++;
             }
         }
