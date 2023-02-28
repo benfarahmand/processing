@@ -2,7 +2,7 @@ class Sprocket {
     float[] angle;
     float[] y, x, z, xf,yf,zf; //the t arrays are for transitioning between modes
     float[] vx, vy, vz; //velocities for gravity mode
-    int mode = 1, lastMode = 1;
+    int mode = 5, lastMode = 5;
     float[] centerColor;
     FFT myFFT;
     boolean transitioning = false;
@@ -12,6 +12,11 @@ class Sprocket {
     float modeTransitionTimer = 0.0, modeTransitionTimerDuration = 2000.0; //if the beats are low for more than 3 seconds, switch the mode
     //boundary condition for the gravity mode
     float leftWall, rightWall, frontWall, backWall, topWall, bottomWall;
+    PImage skullTop, skullBottom;
+    float mouthY = 0.0, mouthIncrementer = 0.0, mouthTotalIncrements = 10.0, skullAngle=0.0;
+    float skullRotateTimer = 0.0, skullRotateStayStillDuration = 2000.0, rotateDirection = 1.0;
+    boolean isSkullRotating = false;
+    float skullEyesRadius = 20.0;
 
     Sprocket(FFT _fft){
         myFFT = _fft;
@@ -43,6 +48,11 @@ class Sprocket {
         backWall = 250;
         topWall = -myHeight/2;
         bottomWall = myHeight/2;
+        skullBottom = loadImage("assets/skull_bottom_cropped_3.png");
+        skullTop = loadImage("assets/skull_top_cropped_3.png");
+        textureMode(NORMAL);
+        textureWrap(CLAMP);
+        skullRotateTimer=millis();
     }
 
     void draw(){
@@ -51,17 +61,99 @@ class Sprocket {
         pushMatrix();
         cameraTracker();
         translate(width/2, height/2, 0);
-        for (int i = 0; i < myFFT.specSize(); i++) {
-            // if(i%4==0) fill(360,100,100);
-            // else if (i%4==1) fill(180,100,100);
-            // else if (i%4==2) fill(90,100,100);
-            // else if (i%4==3) fill(270,100,100);
-            fill(this.colorChanger(i, true));
-            this.calculatePosition(i);
-            this.moveCube(i);
+        if(mode < 5 ){
+            for (int i = 0; i < myFFT.specSize(); i++) {
+                // if(i%4==0) fill(360,100,100);
+                // else if (i%4==1) fill(180,100,100);
+                // else if (i%4==2) fill(90,100,100);
+                // else if (i%4==3) fill(270,100,100);
+                fill(this.colorChanger(i, true));
+                this.calculatePosition(i);
+                this.moveCube(i);
+            }
+        } else {
+            if (mode == 5){
+                float avgBand = 0.0;
+                float avgFreq = 0.0;
+                for (int i = 0; i < myFFT.specSize(); i++) {
+                    avgBand+=myFFT.getBand(i);
+                    avgFreq+=myFFT.getFreq(i);
+                }
+                avgBand=avgBand/myFFT.specSize();
+                avgFreq=avgFreq/myFFT.specSize();
+                tint(
+                    map(avgFreq*speed, 0, 512, 0, 360),
+                    map(avgFreq, 0, 1024, 0, 100)+colorScale,
+                    100.0
+                );
+                translate(0,-myWidth/10,bpm.getBPM()*10);
+                pushMatrix();
+                translate(0,skullTop.height/4+lerp(mouthY,avgFreq*10,mouthIncrementer/mouthTotalIncrements),-100);
+                beginShape();
+                texture(skullBottom);
+                vertex(-skullBottom.width/4, -skullBottom.height/4, 0, 0);
+                vertex( skullBottom.width/4, -skullBottom.height/4, 1, 0);
+                vertex( skullBottom.width/4,  skullBottom.height/4, 1, 1);
+                vertex(-skullBottom.width/4,  skullBottom.height/4, 0, 1);
+                endShape();
+                popMatrix();
+                rotate(skullAngle);
+                // println(skullAngle % (2*PI));
+                if((abs(skullAngle) % (2*PI)) < (PI/16) || (abs(skullAngle) % (2*PI) > (PI*31/16))){
+                    if(isSkullRotating) {
+                        skullRotateTimer = millis();
+                        skullRotateStayStillDuration = random(2000.0,5000.0);
+                        isSkullRotating = false;
+                        rotateDirection=random(-4.0,4.0);
+                        skullAngle = 0.0;
+                    }
+                } else {
+                    isSkullRotating = true;
+                }
+                if(millis() - skullRotateTimer > skullRotateStayStillDuration) {
+                    skullAngle = skullAngle + rotateDirection*avgBand;
+                }
+                if((millis() - skullRotateTimer > skullRotateStayStillDuration*.1) && (millis() - skullRotateTimer < skullRotateStayStillDuration*.9)){
+                    fill(
+                        map(avgFreq*speed, 0, 512, 360, 0),
+                        map(avgFreq, 0, 1024, 100, 0),
+                        map(avgBand, 0, 512, 100, 0)
+                    );
+                    pushMatrix();
+                    translate(-skullTop.width/9+skullEyesRadius*.9,skullEyesRadius*1.5,skullEyesRadius+bpm.getBPM()*10);
+                    sphere(avgFreq*sizeScale);
+                    popMatrix();
+                    pushMatrix();
+                    translate(skullTop.width/9-skullEyesRadius*.9,skullEyesRadius*1.5,skullEyesRadius+bpm.getBPM()*10);
+                    sphere(avgFreq*sizeScale);
+                    popMatrix();
+                }
+                beginShape();
+                texture(skullTop);
+                vertex(-skullTop.width/4, -skullTop.height/4, 0, 0);
+                vertex( skullTop.width/4, -skullTop.height/4, 1, 0);
+                vertex( skullTop.width/4,  skullTop.height/4, 1, 1);
+                vertex(-skullTop.width/4,  skullTop.height/4, 0, 1);
+                endShape();
+                if(mouthIncrementer>=mouthTotalIncrements){
+                    mouthIncrementer=0.0;
+                    mouthY=avgFreq;
+                } else mouthIncrementer++;
+            }
         }
         popMatrix();
         this.modeTransitionTracker();
+    }
+
+    void switchColor(PImage img, color c){
+        for(int x = 0 ; x < img.width ; x++){
+            for(int y = 0 ; y < img.height ; y++){
+                // println(brightness(img.get(x,y)));
+                if(brightness(img.get(x,y))>1.0) {
+                    img.set(x,y,c);
+                }
+            }
+        }
     }
 
     void modeTransitionTracker(){
@@ -309,7 +401,7 @@ class Sprocket {
                 xf[i] = random(leftWall/2,rightWall/2);
                 yf[i] = random(topWall/2,bottomWall/2);
                 zf[i] = random(frontWall/4,backWall/4);
-            }
+            } 
             x[i] = lerp(x[i],xf[i],transitionalPositionIncrementer/totalTransitionIncrements);
             y[i] = lerp(y[i],yf[i],transitionalPositionIncrementer/totalTransitionIncrements);
             z[i] = lerp(z[i],zf[i],transitionalPositionIncrementer/totalTransitionIncrements);
@@ -320,7 +412,7 @@ class Sprocket {
     //so we need some counter that will keep track of how long automatically transition to another mode
     void setMode(int i){ 
         if(!transitioning){
-            if(i>4)i=1;
+            if(i>5)i=1;
             if (i != mode) {
                 transitioning = true;
             }
