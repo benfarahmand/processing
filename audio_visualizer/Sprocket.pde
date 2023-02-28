@@ -102,7 +102,7 @@ class Sprocket {
                 if((abs(skullAngle) % (2*PI)) < (PI/16) || (abs(skullAngle) % (2*PI) > (PI*31/16))){
                     if(isSkullRotating) {
                         skullRotateTimer = millis();
-                        skullRotateStayStillDuration = random(2000.0,5000.0);
+                        skullRotateStayStillDuration = random(10000.0,20000.0);
                         isSkullRotating = false;
                         rotateDirection=random(-4.0,4.0);
                         skullAngle = 0.0;
