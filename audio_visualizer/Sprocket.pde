@@ -1,6 +1,6 @@
 class Sprocket {
     float[] angle;
-    float[] y, x, z, xf,yf,zf; //the t arrays are for transitioning between modes
+    float[] y, x, z, xf,yf,zf; //two sets of position arrays for transitioning between certain modes
     float[] vx, vy, vz; //velocities for gravity mode
     int mode = 5, lastMode = 5;
     float[] centerColor;
