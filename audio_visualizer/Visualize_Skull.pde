@@ -3,7 +3,7 @@ class Visualize_Skull {
     FFT myFFT;
     float myWidth, myHeight;
     PImage skullTop, skullBottom;
-    float mouthY = 0.0, lastMouthY = 0.0, mouthIncrementer = 0.0, mouthTotalIncrements = 5.0, skullAngle=0.0;
+    float mouthY = 0.0, lastMouthY = 0.0, mouthIncrementer = 0.0, mouthTotalIncrements = 3.0, skullAngle=0.0;
     float skullRotateTimer = 0.0, skullRotateStayStillDuration = 2000.0, rotateDirection = 1.0;
     boolean isSkullRotating = false;
     float skullEyesRadius = 20.0;
@@ -35,6 +35,7 @@ class Visualize_Skull {
             avgFreq+=myFFT.getFreq(i);
         }
         avgBand=avgBand/myFFT.specSize();
+        // println(avgBand);
         avgFreq=avgFreq/myFFT.specSize();
         tint(
             map(avgFreq*speed, 0, 512, 0, 360),

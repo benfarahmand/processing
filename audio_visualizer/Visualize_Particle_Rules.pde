@@ -10,7 +10,7 @@ class Visualize_Particle_Rules {
     
     Visualize_Particle_Rules(FFT _fft){
         myFFT = _fft;
-        arraySize = myFFT.specSize()*2;
+        arraySize = myFFT.specSize();
         y = new float[arraySize];
         x = new float[arraySize];
         z = new float[arraySize];
@@ -162,7 +162,7 @@ class Visualize_Particle_Rules {
         float massAdjuster = myFFT.getFreq(i);//map(mouseY,0,900,0,2000);// myFFT.getFreq(i)*2;
         float velocityDamp = 0.5;
         // float distanceAdjuster = map(mouseX,0,1440,0,800);//myFFT.getBand(i)*10;
-        float strengthAdjuster = myFFT.getFreq(i)/myFFT.getBand(i);
+        // float strengthAdjuster = myFFT.getFreq(i)/myFFT.getBand(i);
         float fx = 0;
         float fy = 0;
         float fz = 0;
@@ -210,11 +210,11 @@ class Visualize_Particle_Rules {
                     }
                 }
             }
-            if(!debug) drawLines(i,j,20);
+            if(!debug) drawLines(i,j,30);
         }
-        x[i] = x[i] + vx[i];//*volumeAdjuster;
-        y[i] = y[i] + vy[i];//*volumeAdjuster;
-        z[i] = z[i] + vz[i];//*volumeAdjuster;
+        x[i] = x[i] + vx[i];// * volumeAdjuster*100;
+        y[i] = y[i] + vy[i];// * volumeAdjuster*100;
+        z[i] = z[i] + vz[i];// * volumeAdjuster*100;
         if(x[i]<leftWall){
             x[i]=leftWall;//random(leftWall,rightWall);
             vx[i]=-vx[i]*velocityDamp;
@@ -246,14 +246,14 @@ class Visualize_Particle_Rules {
         float dy = y[j] - y[i];
         float dz = z[j] - z[i];
         float d = sqrt(dx * dx + dy * dy + dz * dz);
-        float r = reverse*volumeAdjuster;
+        float r = reverse*volumeAdjuster*50;
         if(d<distance){
             float force = ((strength) / (distance * massAdjuster));
             fx = fx + force * dx;
             fy = fy + force * dy;
             fz = fz + force * dz;
             if(reverse!=1){
-                if(d<distance/5){
+                if(d<distance/10){
                     fx = fx * r;
                     fy = fy * r;
                     fz = fz * r;

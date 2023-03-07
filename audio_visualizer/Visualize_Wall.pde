@@ -45,14 +45,14 @@ class Visualize_Wall {
             if(gridVerticalIncrementer < 0) gridVerticalIncrementer = verticalGridCubeSpacing;
         }
         x[i] = i%(horizontalGridCubeSpacing)*(myWidth/horizontalGridCubeSpacing)-myWidth/2;
-        y[i] = gridVerticalIncrementer%(verticalGridCubeSpacing)*(myHeight/verticalGridCubeSpacing)-myHeight/2;
+        y[i] = gridVerticalIncrementer%(verticalGridCubeSpacing)*(myHeight/verticalGridCubeSpacing)-myHeight/2-myFFT.getFreq(i)*2;
         z[i] = 0;
     }
 
     void moveCube(int i){
         pushMatrix();
         translate(x[i], y[i], z[i]);
-        box((myFFT.getBand(i)+myFFT.getFreq(i))*sizeScale/40);
+        box((myFFT.getBand(i)+myFFT.getFreq(i))*sizeScale/20+1);
         popMatrix();
     }
 
