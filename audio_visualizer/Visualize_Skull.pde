@@ -1,9 +1,8 @@
 class Visualize_Skull {
-    float[] centerColor;
     FFT myFFT;
     float myWidth, myHeight;
     PImage skullTop, skullBottom;
-    float mouthY = 0.0, lastMouthY = 0.0, mouthIncrementer = 0.0, mouthTotalIncrements = 3.0, skullAngle=0.0;
+    float mouthY = 0.0, lastMouthY = 0.0, mouthIncrementer = 0.0, mouthTotalIncrements = 5.0, skullAngle=0.0;
     float skullRotateTimer = 0.0, skullRotateStayStillDuration = 2000.0, rotateDirection = 1.0;
     boolean isSkullRotating = false;
     float skullEyesRadius = 20.0;
@@ -12,10 +11,6 @@ class Visualize_Skull {
         myFFT = _fft;
         myWidth = parseFloat(width);
         myHeight = parseFloat(height);
-        centerColor = new float[3];
-        centerColor[0] = 0.0;
-        centerColor[1] = 15.0;
-        centerColor[2] = 90.0;
         skullBottom = loadImage("assets/skull_bottom_cropped_3.png");
         skullTop = loadImage("assets/skull_top_cropped_3.png");
         textureMode(NORMAL);
