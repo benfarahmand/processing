@@ -81,8 +81,8 @@ class Visualize_Angel {
             popMatrix();
 
             fill(
-                map(wingFreq[i]*speed, 0, 512, 360, 0),
-                map(wingFreq[i], 0, 1024, 100, 0)+colorScale,
+                map(wingFreq[i]*speed, 0, 512, 0, 360),
+                map(wingFreq[i], 0, 1024, 0, 100)+colorScale,
                 100.0
             );
             pushMatrix();

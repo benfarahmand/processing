@@ -246,7 +246,7 @@ class Visualize_Particle_Rules {
         float dy = y[j] - y[i];
         float dz = z[j] - z[i];
         float d = sqrt(dx * dx + dy * dy + dz * dz);
-        float r = reverse*volumeAdjuster*50;
+        float r = reverse*volumeAdjuster*25;
         if(d<distance){
             float force = ((strength) / (distance * massAdjuster));
             fx = fx + force * dx;
