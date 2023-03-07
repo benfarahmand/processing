@@ -9,7 +9,12 @@ BeatCounter bpm;
 float sizeScale = 1.0, colorScale = 1.0;
 float speed = 1.0;
 float cameraZoom = 0.0;
-Sprocket s;
+Mode_Tracker mt;
+Visualize_Sprocket vSprock;
+Visualize_Wall vWall;
+Visualize_Gravity vGrav;
+Visualize_Particle_Rules vPartRule;
+Visualize_Skull vSkull;
 
 void setup()
 {
@@ -18,9 +23,14 @@ void setup()
   in = minim.getLineIn(Minim.MONO, 2048, 192000.0, 16);
   fft = new FFT(in.bufferSize(), in.sampleRate());
   bpm = new BeatCounter();
-  s = new Sprocket(fft);
+  mt = new Mode_Tracker(1); //start with mode 1
+  vSprock = new Visualize_Sprocket(fft);
+  vWall = new Visualize_Wall(fft);
+  vGrav = new Visualize_Gravity(fft);
+  vPartRule = new Visualize_Particle_Rules(fft);
+  vSkull = new Visualize_Skull(fft);
   colorMode(HSB, 360.0, 100.0, 100.0, 1.0);
-  frameRate(30);
+  // frameRate(60);
 }
 
 void draw()
@@ -32,7 +42,7 @@ void draw()
   backgroundSetter();
   fft.forward(in.mix);
   bpm.run();
-  s.draw();
+  mt.draw(); //manages which visualizer to draw based on the selected mode
 }
 
 void backgroundSetter() {
@@ -42,19 +52,6 @@ void backgroundSetter() {
   fill(0, 0, 0, map(bpm.getBPM(), 1.0, 8.0, 1.0, 0.0));
   rect(-2*width, -2*height, 5*width, 5*height);
   popMatrix();
-}
-
-color colorChanger(int i, boolean b) {
-  if (b) return color(
-    map(fft.getFreq(i)*speed, 0, 512, 0, 360),
-    map(fft.getFreq(i), 0, 1024, 0, 100)+colorScale,
-    100.0
-    );
-  else return color(
-    map(fft.getFreq(i)*speed, 0, 512, 360, 0),
-    map(fft.getFreq(i), 0, 1024, 100, 0),
-    map(fft.getBand(i), 0, 512, 100, 0)
-    );
 }
 
 void cameraTracker() {
@@ -71,14 +68,14 @@ void stop()
 
 void keyPressed(){
   if(key == '1'){
-    s.setMode(1);
+    mt.setMode(1);
   }else if(key == '2'){
-    s.setMode(2);
+    mt.setMode(2);
   }else if(key == '3'){
-    s.setMode(3);
+    mt.setMode(3);
   }else if(key == '4'){
-    s.setMode(4);
+    mt.setMode(4);
   }else if(key == '5'){
-    s.setMode(5);
+    mt.setMode(5);
   }
 }
