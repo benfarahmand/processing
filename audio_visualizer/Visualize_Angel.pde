@@ -9,8 +9,9 @@ class Visualize_Angel {
     PImage wingLeft, wingRight;
     int numberOfWings = 6;
     Eye myEyes[];
-    int eyeCount = 30;
+    int eyeCount = 40;
     float innerCircleRadius = 500.0;
+    int spaceCounter = 100;
 
     Visualize_Angel(FFT _fft){
         myFFT=_fft;
@@ -24,42 +25,53 @@ class Visualize_Angel {
         wingRight = loadImage("assets/angel_wing_right.png");
         myEyes = new Eye[eyeCount];
         for(int i = 0 ; i < myEyes.length ; i ++){
+            float x = random(-innerCircleRadius/5.0,innerCircleRadius/5.0);
+            float y = random(-innerCircleRadius/5.0,innerCircleRadius/5.0);
             if(i==0) myEyes[i] = new Eye(0,0,0,50);
-            else myEyes[i] = new Eye(random(-innerCircleRadius/2.0,innerCircleRadius/2.0),random(-innerCircleRadius/2.0,innerCircleRadius/2.0),0.0,random(10.0,20.0));
+            else myEyes[i] = new Eye(x,y,0.0,random(10.0,20.0));
         }
-        spaceCircles();
+        spaceCircles(spaceCounter);
     }
 
-    void spaceCircles(){
+    void spaceCircles(int spaceCounter){
         for(int i = 0 ; i < myEyes.length ; i ++){
-            float circleD = sqrt(myEyes[i].x*myEyes[i].x + myEyes[i].y*myEyes[i].y);
             for(int j = 0 ; j < myEyes.length ;j++){
                 if(i!=j && i!=0){
                     float dx = - myEyes[i].x + myEyes[j].x;
                     float dy = - myEyes[i].y + myEyes[j].y;
                     float d = sqrt(dx * dx + dy * dy);
-                    if(d<(myEyes[i].radius+myEyes[j].radius) && circleD<innerCircleRadius){
-                        myEyes[i].x=random(-innerCircleRadius/2.0,innerCircleRadius/2.0);
-                        myEyes[i].y=random(-innerCircleRadius/2.0,innerCircleRadius/2.0);
+                    if(d<(myEyes[i].radius+myEyes[j].radius*1.1)){
+                        if(i%3==0){
+                            myEyes[i].x=random(-innerCircleRadius*0.1,innerCircleRadius*0.1);
+                            myEyes[i].y=random(-innerCircleRadius*0.85,innerCircleRadius*0.85);
+                        } else if (i%3==1){
+                            myEyes[i].x=random(-innerCircleRadius*0.6,innerCircleRadius*0.6);
+                            myEyes[i].y=random(-innerCircleRadius*0.2,innerCircleRadius*0.2);
+                        } else {
+                            myEyes[i].x=random(-innerCircleRadius*0.4,innerCircleRadius*0.4);
+                            myEyes[i].y=random(-innerCircleRadius*0.4,innerCircleRadius*0.4);
+                        }
+                        
                     }
                 }
             }
         }
         boolean stillOverlapping = false;
         for(int i = 0 ; i < myEyes.length ; i ++){
-            float circleD = sqrt(myEyes[i].x*myEyes[i].x + myEyes[i].y*myEyes[i].y);
+            // float circleD = sqrt(myEyes[i].x*myEyes[i].x + myEyes[i].y*myEyes[i].y);
             for(int j = 0 ; j < myEyes.length ;j++){
                 if(i!=j){
                     float dx = - myEyes[i].x + myEyes[j].x;
                     float dy = - myEyes[i].y + myEyes[j].y;
                     float d = sqrt(dx * dx + dy * dy);
-                    if(d<(myEyes[i].radius+myEyes[j].radius) && circleD<innerCircleRadius){
+                    if(d<(myEyes[i].radius+myEyes[j].radius)*1.1){
                         stillOverlapping = true;
                     }
                 }
             }
         }
-        if(stillOverlapping) spaceCircles();
+        spaceCounter--;
+        if(stillOverlapping && spaceCounter>0) spaceCircles(spaceCounter); //this shouldn't take more than a second or two
     }
 
     void draw(){
@@ -67,11 +79,14 @@ class Visualize_Angel {
         pushMatrix();
         cameraTracker();
         translate(width/2, height/2, 0);
+        float bounce = 0.0;
         for (int i = 0; i < myFFT.specSize(); i++) {
+            bounce = bounce + myFFT.getFreq(i);
             freq[i] = myFFT.getFreq(i);
             band[i] = myFFT.getBand(i);
             angle[i] = angle[i] + myFFT.getFreq(i)/100;
         }
+        bounce = bounce / myFFT.specSize();
         for(int i = 0 ; i < numberOfWings ; i++){
             float avgFreq = 0.0;
             float avgBand = 0.0;
@@ -87,11 +102,13 @@ class Visualize_Angel {
         }
 
         for(int i = 0 ; i < numberOfWings ; i++){
+            
             tint(
                 map(wingFreq[i]*speed, 0, 512, 0, 360),
                 map(wingFreq[i], 0, 1024, 0, 100)+colorScale,
                 100.0
             );
+
             pushMatrix();
             if(i>numberOfWings-4) scale(1,-1,1);
             beginShape();
@@ -118,9 +135,17 @@ class Visualize_Angel {
             endShape();
             popMatrix();
         }
-        for(int i = 0 ; i < myEyes.length ; i++){
+        
+        //the zero-th eye is the big center eye, skip that and then calculate distances from the others
+        for(int i = 0 ; i < myEyes.length ; i++){ 
+            float dx = 0.0;
+            float dy = 0.0;
+            if(i!=0){
+                dx = (myEyes[i].x - myEyes[0].x)*bounce/100;
+                dy = (myEyes[i].y - myEyes[0].y)*bounce/100;
+            }
             pushMatrix();
-            translate(myEyes[i].x,myEyes[i].y,myEyes[i].z);
+            translate(myEyes[i].x+dx,myEyes[i].y+dy,myEyes[i].z);
             myEyes[i].drawEye();
             popMatrix();
         }

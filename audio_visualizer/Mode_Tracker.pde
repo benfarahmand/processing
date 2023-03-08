@@ -24,7 +24,6 @@ class Mode_Tracker {
     //transition between modes after each song, maybe we can detect when the song ends by the duration of no beats
     //so we need some counter that will keep track of how long automatically transition to another mode
     void setMode(int i){ 
-        // if(i>6)i=1;
         mode = i;
         if(mode == 1) vSprock.initMode();
         else if(mode == 2) vWall.initMode();

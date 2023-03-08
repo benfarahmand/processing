@@ -53,8 +53,8 @@ void backgroundSetter() {
   pushMatrix();
   cameraTracker();
   translate(0, 0, -2000);
-  // fill(0);
-  fill(0, 0, 0, map(bpm.getBPM(), 1.0, 10.0, 1.0, 0.0));
+  if(mt.mode != 7) fill(0, 0, 0, map(bpm.getBPM(), 1.0, 10.0, 1.0, 0.0));
+  else fill(0);
   rect(-2*width, -2*height, 5*width, 5*height);
   popMatrix();
 }
