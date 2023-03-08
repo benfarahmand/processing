@@ -7,6 +7,7 @@ class Eye {
     float blinkTimer = 0.0;
     float eyesOpenDuration = 0.0;
     float blinkTracker = 500.0;
+    float lookX, lookY;
 
     Eye(float _x, float _y, float _z, float _radius){
         x=_x;
@@ -25,6 +26,8 @@ class Eye {
     }
 
     void drawEye(){
+        lookX = mouseX-x;
+        lookY = mouseY-y;
         if((millis() - blinkTimer > eyesOpenDuration) && !isBlinking){
             isBlinking = true;
             blinkDirection = -1.0;
@@ -42,8 +45,8 @@ class Eye {
             blinkTracker=blinkTracker + (50.0*blinkDirection);
         }
         pushMatrix();
-        // rotateX(avgEyeRot);
-        // rotateY(cos(avgEyeRot));
+        rotateX(map(lookY,0,900,PI/2,-PI/2));
+        rotateY(map(lookX,0,1400,-PI/2,PI/2));
         shape(eyeShape,0,0);
         popMatrix();
         if(isBlinking){

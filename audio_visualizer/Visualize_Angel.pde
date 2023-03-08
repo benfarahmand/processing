@@ -6,12 +6,11 @@
 class Visualize_Angel {
     FFT myFFT;
     float[] angle, freq, band, wingAngles, wingFreq, wingBands;
-    PImage wingLeft, wingRight;//, eye;
-    // PShape eyeShape;
-    int numberOfWings = 50;
+    PImage wingLeft, wingRight;
+    int numberOfWings = 6;
     Eye myEyes[];
-    int eyeCount = 20;
-    // float angelEyesRadius = 20.0;
+    int eyeCount = 30;
+    float innerCircleRadius = 500.0;
 
     Visualize_Angel(FFT _fft){
         myFFT=_fft;
@@ -25,35 +24,36 @@ class Visualize_Angel {
         wingRight = loadImage("assets/angel_wing_right.png");
         myEyes = new Eye[eyeCount];
         for(int i = 0 ; i < myEyes.length ; i ++){
-            myEyes[i] = new Eye(random(-150.0,150.0),random(-150.0,150.0),0.0,random(10.0,20.0));
+            if(i==0) myEyes[i] = new Eye(0,0,0,50);
+            else myEyes[i] = new Eye(random(-innerCircleRadius/2.0,innerCircleRadius/2.0),random(-innerCircleRadius/2.0,innerCircleRadius/2.0),0.0,random(10.0,20.0));
         }
         spaceCircles();
     }
 
     void spaceCircles(){
         for(int i = 0 ; i < myEyes.length ; i ++){
+            float circleD = sqrt(myEyes[i].x*myEyes[i].x + myEyes[i].y*myEyes[i].y);
             for(int j = 0 ; j < myEyes.length ;j++){
-                if(i!=j){
+                if(i!=j && i!=0){
                     float dx = - myEyes[i].x + myEyes[j].x;
                     float dy = - myEyes[i].y + myEyes[j].y;
                     float d = sqrt(dx * dx + dy * dy);
-                    if(d<(myEyes[i].radius+myEyes[j].radius)*1.5){
-                        myEyes[i].x=random(-150.0,150.0);
-                        myEyes[i].y=random(-150.0,175.0);
-                        // myEyes[j].x=myEyes[j].x-dx;
-                        // myEyes[j].y=myEyes[j].y-dy;
+                    if(d<(myEyes[i].radius+myEyes[j].radius) && circleD<innerCircleRadius){
+                        myEyes[i].x=random(-innerCircleRadius/2.0,innerCircleRadius/2.0);
+                        myEyes[i].y=random(-innerCircleRadius/2.0,innerCircleRadius/2.0);
                     }
                 }
             }
         }
         boolean stillOverlapping = false;
         for(int i = 0 ; i < myEyes.length ; i ++){
+            float circleD = sqrt(myEyes[i].x*myEyes[i].x + myEyes[i].y*myEyes[i].y);
             for(int j = 0 ; j < myEyes.length ;j++){
                 if(i!=j){
                     float dx = - myEyes[i].x + myEyes[j].x;
                     float dy = - myEyes[i].y + myEyes[j].y;
                     float d = sqrt(dx * dx + dy * dy);
-                    if(d<(myEyes[i].radius+myEyes[j].radius)){
+                    if(d<(myEyes[i].radius+myEyes[j].radius) && circleD<innerCircleRadius){
                         stillOverlapping = true;
                     }
                 }
@@ -93,6 +93,7 @@ class Visualize_Angel {
                 100.0
             );
             pushMatrix();
+            if(i>numberOfWings-4) scale(1,-1,1);
             beginShape();
             rotate(sin(wingAngles[i]+i*(PI)/numberOfWings));
             translate(-wingLeft.width*1.25,0,-10*numberOfWings+10*i);
@@ -106,6 +107,7 @@ class Visualize_Angel {
 
             pushMatrix();
             beginShape();
+            if(i>numberOfWings-4) scale(1,-1,1);
             rotate(sin(-wingAngles[i]-i*(PI)/numberOfWings));
             translate(wingRight.width*1.25,0,-10*numberOfWings+10*i);
             texture(wingRight);
