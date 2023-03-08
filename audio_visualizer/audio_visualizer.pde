@@ -15,6 +15,7 @@ Visualize_Wall vWall;
 Visualize_Gravity vGrav;
 Visualize_Particle_Rules vPartRule;
 Visualize_Skull vSkull;
+Visualize_Skull_with_Wings vSkullWings;
 Visualize_Angel vAngel;
 
 void setup()
@@ -30,6 +31,7 @@ void setup()
   vGrav = new Visualize_Gravity(fft);
   vPartRule = new Visualize_Particle_Rules(fft);
   vSkull = new Visualize_Skull(fft);
+  vSkullWings = new Visualize_Skull_with_Wings(fft);
   vAngel = new Visualize_Angel(fft);
   colorMode(HSB, 360.0, 100.0, 100.0, 1.0);
   // frameRate(60);
@@ -50,7 +52,7 @@ void draw()
 void backgroundSetter() {
   pushMatrix();
   cameraTracker();
-  translate(0, 0, -1000);
+  translate(0, 0, -2000);
   // fill(0);
   fill(0, 0, 0, map(bpm.getBPM(), 1.0, 10.0, 1.0, 0.0));
   rect(-2*width, -2*height, 5*width, 5*height);
@@ -82,5 +84,7 @@ void keyPressed(){
     mt.setMode(5);
   }else if(key == '6'){
     mt.setMode(6);
+  }else if(key == '7'){
+    mt.setMode(7);
   }
 }
