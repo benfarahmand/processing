@@ -6,6 +6,7 @@
 class Visualize_Angel {
     FFT myFFT;
     float[] angle, freq, band, wingAngles, wingFreq, wingBands;
+    float[] eyeLookX, eyeLookY;
     PImage wingLeft, wingRight;
     int numberOfWings = 6;
     Eye myEyes[];
@@ -27,9 +28,11 @@ class Visualize_Angel {
         for(int i = 0 ; i < myEyes.length ; i ++){
             float x = random(-innerCircleRadius/5.0,innerCircleRadius/5.0);
             float y = random(-innerCircleRadius/5.0,innerCircleRadius/5.0);
-            if(i==0) myEyes[i] = new Eye(0,0,0,50);
-            else myEyes[i] = new Eye(x,y,0.0,random(10.0,20.0));
+            if(i==0) myEyes[i] = new Eye(0,0,0,50, true);
+            else myEyes[i] = new Eye(x,y,0.0,random(10.0,20.0), true);
         }
+        eyeLookX = new float[myEyes.length];
+        eyeLookY = new float[myEyes.length];
         spaceCircles(spaceCounter);
     }
 
@@ -136,6 +139,17 @@ class Visualize_Angel {
             popMatrix();
         }
         
+        for(int i = 0 ; i < myEyes.length ; i++){
+            float avgLookX = 0.0;
+            float avgLookY = 0.0;
+            for(int j = i*myFFT.specSize()/myEyes.length ; j < (i+1)*myFFT.specSize()/myEyes.length ; j++){
+                avgLookX = avgLookX + freq[i];
+                avgLookY = avgLookY + band[i];
+            }
+            eyeLookX[i] = eyeLookX[i] + (avgLookX/(myFFT.specSize()/myEyes.length))/100;
+            eyeLookY[i] = eyeLookY[i] + (avgLookY/(myFFT.specSize()/myEyes.length))/100;
+        }
+
         //the zero-th eye is the big center eye, skip that and then calculate distances from the others
         for(int i = 0 ; i < myEyes.length ; i++){ 
             float dx = 0.0;
@@ -146,6 +160,12 @@ class Visualize_Angel {
             }
             pushMatrix();
             translate(myEyes[i].x+dx,myEyes[i].y+dy,myEyes[i].z);
+            myEyes[i].lookAtXY(
+                width/4 * max(map(bpm.getBPM(), 1.0, 8.0, 1.0, 0.0),0.0) * sin(eyeLookX[i]) + width/2,
+                height/4 * max(map(bpm.getBPM(), 1.0, 8.0, 1.0, 0.0),0.0) * cos(eyeLookY[i]) + height/2
+                );
+            // if(bpm.getBPM()>7) myEyes[i].lookAtXY(width/4*sin(eyeLookX[i])+width/2,height/4*cos(eyeLookY[i])+height/2);
+            // else myEyes[i].lookAtXY(width/2,height/2);
             myEyes[i].drawEye();
             popMatrix();
         }

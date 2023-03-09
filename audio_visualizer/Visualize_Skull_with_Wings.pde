@@ -4,7 +4,7 @@ class Visualize_Skull_with_Wings {
     float[] angle, freq, band, wingAngles, wingFreq, wingBands;
     PImage wingLeft, wingRight, body, eye, eyeLidTop;
     PShape eyeShape, eyeLid;
-    int numberOfWings = 50;
+    int numberOfWings = 6;
     float angelEyesRadius = 20.0;
 
     PImage skullTop, skullBottom;
@@ -23,8 +23,8 @@ class Visualize_Skull_with_Wings {
         wingAngles = new float[numberOfWings];
         wingBands = new float[numberOfWings];
         wingFreq = new float[numberOfWings];
-        wingLeft = loadImage("assets/angel_wing_left.png");
-        wingRight = loadImage("assets/angel_wing_right.png");
+        wingLeft = loadImage("assets/skeleton_wing_left.png");
+        wingRight = loadImage("assets/skeleton_wing_right.png");
         eye = loadImage("assets/eye_white_2.jpg");
         eyeLidTop = loadImage("assets/lid-upper-symmetrical.png");
         eyeShape = createShape(SPHERE,100); //http://processing.github.io/processing-javadocs/core/
@@ -80,7 +80,9 @@ class Visualize_Skull_with_Wings {
                 map(wingFreq[i], 0, 1024, 0, 100)+colorScale,
                 100.0
             );
+
             pushMatrix();
+            if(i>numberOfWings-4) scale(1,-1,1);
             beginShape();
             rotate(sin(wingAngles[i]+i*(PI)/numberOfWings));
             translate(-wingLeft.width,0,-10*numberOfWings+10*i);
@@ -93,6 +95,7 @@ class Visualize_Skull_with_Wings {
             popMatrix();
 
             pushMatrix();
+            if(i>numberOfWings-4) scale(1,-1,1);
             beginShape();
             rotate(sin(-wingAngles[i]-i*(PI)/numberOfWings));
             translate(wingRight.width,0,-10*numberOfWings+10*i);
@@ -123,7 +126,7 @@ class Visualize_Skull_with_Wings {
         // vertex( eye.width/2,  eye.height/2, 1, 1);
         // vertex(-eye.width/2,  eye.height/2, 0, 1);
         // endShape();
-        translate(0,0,-numberOfWings*30);
+        translate(0,0,-numberOfWings*30*10);
         drawSkull();
         // pushMatrix();
         // rotateX(sin(avgEyeRot));
