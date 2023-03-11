@@ -17,6 +17,8 @@ Visualize_Particle_Rules vPartRule;
 Visualize_Skull vSkull;
 Visualize_Skull_with_Wings vSkullWings;
 Visualize_Angel vAngel;
+Visualize_Tentacles vTenticles;
+boolean backgroundReset = false;
 
 void setup()
 {
@@ -33,6 +35,7 @@ void setup()
   vSkull = new Visualize_Skull(fft);
   vSkullWings = new Visualize_Skull_with_Wings(fft);
   vAngel = new Visualize_Angel(fft);
+  vTenticles = new Visualize_Tentacles(fft);
   colorMode(HSB, 360.0, 100.0, 100.0, 1.0);
   // frameRate(60);
 }
@@ -53,7 +56,7 @@ void backgroundSetter() {
   pushMatrix();
   cameraTracker();
   translate(0, 0, -2000);
-  if(mt.mode != 7) fill(0, 0, 0, map(bpm.getBPM(), 1.0, 10.0, 1.0, 0.0));
+  if(mt.mode != 7 && mt.mode!=8 && !backgroundReset) fill(0, 0, 0, map(bpm.getBPM(), 1.0, 10.0, 1.0, 0.0));
   else fill(0);
   rect(-2*width, -2*height, 5*width, 5*height);
   popMatrix();
@@ -86,5 +89,9 @@ void keyPressed(){
     mt.setMode(6);
   }else if(key == '7'){
     mt.setMode(7);
+  }else if(key == '8'){
+    mt.setMode(8);
+  }else if(key == 'f'){
+    backgroundReset=!backgroundReset;
   }
 }

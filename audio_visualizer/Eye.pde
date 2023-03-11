@@ -8,6 +8,7 @@ class Eye {
     float eyesOpenDuration = 0.0;
     float blinkTracker = 500.0;
     float lookX, lookY;
+    color myC;
 
     Eye(float _x, float _y, float _z, float _radius, boolean _enableBlink){
         x=_x;
@@ -29,6 +30,10 @@ class Eye {
     void lookAtXY(float lX, float lY){
         lookX = lX-x;
         lookY = lY-y;
+    }
+
+    void setTint(color c){
+        myC = c;
     }
 
     void drawEye(){
@@ -55,6 +60,7 @@ class Eye {
         pushMatrix();
         rotateX(map(lookY,0,height,PI/2,-PI/2));
         rotateY(map(lookX,0,width,-PI/2,PI/2));
+        eyeShape.tint(myC);
         shape(eyeShape,0,0);
         popMatrix();
         if(enableBlink){
