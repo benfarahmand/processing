@@ -1,17 +1,19 @@
 class Visualize_Edges {
     FFT myFFT;
-    PImage[] pastImages;
-    int totalHistory = 50;
+    ArrayList<PImage> pastImages;
+    int totalHistory = 25;
+    int minHistory = 10;
+    int maxHistory = 50;
     int historyTracker;
     color targetColor = color(0, 0, 0); // Black color (you can change this to your desired color)
     
     
     Visualize_Edges(FFT _fft) {
         myFFT = _fft;
-        pastImages = new PImage[totalHistory];
-        for (int i = 0; i < pastImages.length; i++) {
-            pastImages[i] = createImage(640, 480, ARGB);
-        }
+        pastImages = new ArrayList<PImage>();
+        // for (int i = 0; i < totalHistory; i++) {
+        //     pastImages.add(createImage(640, 480, ARGB));
+        // }
     }
     
     void draw() {
@@ -21,8 +23,8 @@ class Visualize_Edges {
     }
     
     void drawPast() {
-        for (int i = 0; i < pastImages.length; i++) {
-            image(pastImages[i], 0, 0, width, height);
+        for (int i = 0; i < pastImages.size() ; i++) {
+            image(pastImages.get(i), 0, 0, width, height);
         }
     }
     
@@ -34,10 +36,31 @@ class Visualize_Edges {
     }
     
     void storeHistory() {
+        modifyHistoryLength();
         // pastImages[historyTracker] = createMask(opencv.getOutput(), targetColor);
-        pastImages[historyTracker] = applyMaskAndReplaceColor(opencv.getOutput(), targetColor, this.colorChanger((int) map(historyTracker,0,totalHistory,0,myFFT.specSize()), true));
+        pastImages.add(applyMaskAndReplaceColor(opencv.getOutput(), targetColor, this.colorChanger((int) map(historyTracker,0,totalHistory,0,myFFT.specSize()), true)));
         historyTracker++;
-        if (historyTracker >=  pastImages.length)historyTracker = 0;
+        // println(pastImages.size());
+        if (historyTracker >=  totalHistory) {
+            historyTracker = 0;
+        }
+        if(pastImages.size()>=totalHistory){
+            pastImages.remove(0);
+        }
+    }
+
+    void modifyHistoryLength(){
+        // int currentHistory = (int) map(bpm.getBPM(), 2.0, 10.0, minHistory, maxHistory);
+        int currentHistory = (int) map(bpm.getBPM(), 2.0, 10.0, maxHistory, minHistory);
+        // println(currentHistory);
+        if(currentHistory > totalHistory) {
+            totalHistory++;
+            if(totalHistory>maxHistory) totalHistory=maxHistory;
+        }
+        else {
+            totalHistory--;
+            if(totalHistory<minHistory) totalHistory=minHistory;
+        }
     }
     
     PImage createMask(PImage img, color target) {
@@ -72,9 +95,9 @@ class Visualize_Edges {
         
         color colorChanger(int i, boolean b) {
             if (b) return color(
-                map(myFFT.getFreq(i) * speed, 0, 512, 0, 255),
-                map(myFFT.getBand(i), 0, 512, 100, 0),
-                100.0
+                map(myFFT.getFreq(i) * speed, 0, 512, 0, 360),
+                map(myFFT.getFreq(i), 0, 1024, 0, 100)+colorScale,
+                map(myFFT.getBand(i), 0, 512, 100, 0)
                );
             else return color(
                 map(myFFT.getFreq(i) * speed, 0, 512, 360, 0),
