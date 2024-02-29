@@ -1,10 +1,14 @@
 import ddf.minim.analysis.*;
 import ddf.minim.*;
+import gab.opencv.*;
+import processing.video.*;
 
 Minim minim;
 FFT fft;
 AudioInput in;
 BeatCounter bpm;
+Capture video;
+OpenCV opencv;
 
 float sizeScale = 1.0, colorScale = 1.0;
 float speed = 1.0;
@@ -18,6 +22,7 @@ Visualize_Skull vSkull;
 Visualize_Skull_with_Wings vSkullWings;
 Visualize_Angel vAngel;
 Visualize_Tentacles vTenticles;
+Visualize_Edges vEdges;
 boolean backgroundReset = false;
 
 void setup()
@@ -27,6 +32,8 @@ void setup()
   in = minim.getLineIn(Minim.MONO, 2048, 192000.0, 16);
   fft = new FFT(in.bufferSize(), in.sampleRate());
   bpm = new BeatCounter();
+  video = new Capture(this, "pipeline:autovideosrc");
+  opencv = new OpenCV(this, 640, 480);
   mt = new Mode_Tracker(1); //start with mode 1
   vSprock = new Visualize_Sprocket(fft);
   vWall = new Visualize_Wall(fft);
@@ -36,6 +43,7 @@ void setup()
   vSkullWings = new Visualize_Skull_with_Wings(fft);
   vAngel = new Visualize_Angel(fft);
   vTenticles = new Visualize_Tentacles(fft);
+  vEdges = new Visualize_Edges(fft);
   colorMode(HSB, 360.0, 100.0, 100.0, 1.0);
   // frameRate(60);
 }
@@ -56,7 +64,7 @@ void backgroundSetter() {
   pushMatrix();
   cameraTracker();
   translate(0, 0, -2000);
-  if(mt.mode != 7 && mt.mode!=8 && !backgroundReset) fill(0, 0, 0, map(bpm.getBPM(), 1.0, 10.0, 1.0, 0.0));
+  if(mt.mode != 7 && mt.mode!=8 && mt.mode!=9 && !backgroundReset) fill(0, 0, 0, map(bpm.getBPM(), 1.0, 10.0, 1.0, 0.0));
   else fill(0);
   rect(-2*width, -2*height, 5*width, 5*height);
   popMatrix();
@@ -91,7 +99,13 @@ void keyPressed(){
     mt.setMode(7);
   }else if(key == '8'){
     mt.setMode(8);
+  }else if(key == '9'){
+    mt.setMode(9);
   }else if(key == 'f'){
     backgroundReset=!backgroundReset;
   }
+}
+
+void captureEvent(Capture c) {
+    c.read();
 }

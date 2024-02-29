@@ -20,12 +20,21 @@ class Mode_Tracker {
         else if(mode == 6) vSkullWings.draw();
         else if(mode == 7) vAngel.draw();
         else if(mode == 8) vTenticles.draw();
+        else if(mode == 9) vEdges.draw();
     }
 
     //transition between modes after each song, maybe we can detect when the song ends by the duration of no beats
     //so we need some counter that will keep track of how long automatically transition to another mode
-    void setMode(int i){ 
+    void setMode(int i){
+        //clean up any modes that need cleaning up
+        if(i!=mode && mode==9){
+            vEdges.endMode();
+        }
+
+        //store the mode
         mode = i;
+
+        //init the new mode
         if(mode == 1) vSprock.initMode();
         else if(mode == 2) vWall.initMode();
         else if(mode == 3) vGrav.initMode();
@@ -34,6 +43,7 @@ class Mode_Tracker {
         else if(mode == 6) vSkullWings.initMode();
         else if(mode == 7) vAngel.initMode();
         else if(mode == 8) vTenticles.initMode();
+        else if(mode == 9) vEdges.initMode();
     }
 
     void modeTransitioner(){
