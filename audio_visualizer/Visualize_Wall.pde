@@ -1,5 +1,6 @@
-class Visualize_Wall {
+class Visualize_Wall implements Visualizer {
     
+    String NAME = "Wall";
     float[] y, x, z;
     float[] centerColor;
     FFT myFFT;
@@ -24,6 +25,7 @@ class Visualize_Wall {
         centerColor[2] = 90.0;
     }
 
+    @Override
     void draw(){
         noStroke();
         pushMatrix();
@@ -69,7 +71,16 @@ class Visualize_Wall {
             );
     }
 
+    @Override
     void initMode(){
         //no init for this mode, can go straight to drawing
+    }
+
+    @Override
+    void endMode() {}   
+
+    @Override
+    String getName(){
+        return NAME;
     }
 }

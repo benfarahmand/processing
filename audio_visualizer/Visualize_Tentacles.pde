@@ -1,6 +1,7 @@
 // inspired by Daniel Shiffman's inverse kinematics: https://github.com/CodingTrain/website-archive/tree/main/CodingChallenges
 
-class Visualize_Tentacles {
+class Visualize_Tentacles implements Visualizer {
+    String NAME = "Tentacles";
     float[] angle;
     float[] y, x, z, vx, vy, vz;
     float[] centerColor;
@@ -52,6 +53,7 @@ class Visualize_Tentacles {
         bottomWall = myHeight;
     }
 
+    @Override
     void draw(){
         //calculate the tentacle colors
         // for(int i = 0 ; i < tentacles.length ; i ++){
@@ -116,6 +118,7 @@ class Visualize_Tentacles {
     //         );
     // }
 
+    @Override
     void initMode(){
         //no init for this mode, can go straight to drawing
         for(var i = 0 ; i < numberOfTentacles ; i++){
@@ -123,6 +126,14 @@ class Visualize_Tentacles {
             y[i] = random(topWall,bottomWall);
             z[i] = random(frontWall,backWall);
         }
+    }
+
+    @Override
+    void endMode() {}   
+
+    @Override
+    String getName(){
+        return NAME;
     }
 
     float[] calculatePosition(float soundAffect){

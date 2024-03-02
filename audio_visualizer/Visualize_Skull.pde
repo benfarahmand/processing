@@ -1,4 +1,5 @@
-class Visualize_Skull {
+class Visualize_Skull implements Visualizer {
+    String NAME = "Skull";
     FFT myFFT;
     float myWidth, myHeight;
     PImage skullTop, skullBottom;
@@ -23,6 +24,7 @@ class Visualize_Skull {
         skullRotateTimer=millis();
     }
 
+    @Override
     void draw(){
         noStroke();
         pushMatrix();
@@ -135,8 +137,17 @@ class Visualize_Skull {
             );
     }
 
+    @Override
     void initMode(){
         //init not required, continue straight to draw
         //place holder in case we want to add some init animation
+    }
+
+    @Override
+    void endMode() {}   
+
+    @Override
+    String getName(){
+        return NAME;
     }
 }

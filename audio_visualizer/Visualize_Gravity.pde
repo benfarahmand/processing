@@ -1,4 +1,5 @@
-class Visualize_Gravity {
+class Visualize_Gravity implements Visualizer {
+    String NAME = "Particles";
     float[] angle;
     float[] y, x, z, xf,yf,zf; //two sets of position arrays for transitioning between certain modes
     float[] vx, vy, vz; //velocities for gravity mode
@@ -33,6 +34,7 @@ class Visualize_Gravity {
         bottomWall = myHeight/2;
     }
 
+    @Override
     void draw(){
         noStroke();
         pushMatrix();
@@ -116,6 +118,7 @@ class Visualize_Gravity {
         popMatrix();
     }
 
+    @Override
     void initMode(){
         for(var i = 0 ; i < myFFT.specSize() ; i++){
             x[i] = random(leftWall,rightWall);
@@ -123,6 +126,9 @@ class Visualize_Gravity {
             z[i] = random(frontWall,backWall);
         }
     }
+
+    @Override
+    void endMode() {}   
 
     color colorChanger(int i, boolean b) {
         if (b) return color(
@@ -135,5 +141,10 @@ class Visualize_Gravity {
             map(myFFT.getFreq(i), 0, 1024, 100, 0),
             map(myFFT.getBand(i), 0, 512, 100, 0)
             );
+    }
+
+    @Override
+    String getName(){
+        return NAME;
     }
 }

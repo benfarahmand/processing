@@ -1,4 +1,5 @@
-class Visualize_Sprocket {
+class Visualize_Sprocket implements Visualizer {
+    String NAME = "Sprocket";
     float[] angle;
     float[] y, x, z;
     float[] centerColor;
@@ -20,6 +21,7 @@ class Visualize_Sprocket {
         centerColor[2] = 90.0;
     }
 
+    @Override
     void draw(){
         noStroke();
         pushMatrix();
@@ -63,7 +65,16 @@ class Visualize_Sprocket {
         popMatrix();
     }
 
+    @Override
     void initMode(){
         //no init for this mode, can go straight to drawing
+    }
+
+    @Override
+    void endMode() {}   
+
+    @Override
+    String getName(){
+        return NAME;
     }
 }

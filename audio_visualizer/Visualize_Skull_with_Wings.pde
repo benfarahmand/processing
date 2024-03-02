@@ -1,4 +1,5 @@
-class Visualize_Skull_with_Wings {
+class Visualize_Skull_with_Wings implements Visualizer {
+    String NAME = "Skull with Wings";
     FFT myFFT;
     float myWidth, myHeight;
     float[] angle, freq, band, wingAngles, wingFreq, wingBands;
@@ -43,6 +44,7 @@ class Visualize_Skull_with_Wings {
         textureWrap(CLAMP);
     }
 
+    @Override
     void draw(){
         noStroke();
         pushMatrix();
@@ -151,9 +153,18 @@ class Visualize_Skull_with_Wings {
         popMatrix();
     }
 
+    @Override
     void initMode(){
         //init not required, continue straight to draw
         //place holder in case we want to add some init animation
+    }
+
+    @Override
+    void endMode() {}   
+
+    @Override
+    String getName(){
+        return NAME;
     }
 
     void drawSkull(){

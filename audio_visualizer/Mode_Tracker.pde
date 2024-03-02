@@ -4,46 +4,41 @@ class Mode_Tracker {
     float transitionalPositionIncrementer = 0.0, totalTransitionIncrements = 40.0;
     int mode, lastMode;
     float modeTransitionTimer = 0.0, modeTransitionTimerDuration = 2000.0; //if the beats are low for more than 3 seconds, switch the mode
+    ArrayList<Visualizer> myVisualizers;
 
     Mode_Tracker(int i){
         mode = i;
         lastMode = i;
         modeTransitionTimer = millis()+10000.0;
+        myVisualizers = new ArrayList<Visualizer>();
     }
 
     void draw(){
-        if(mode == 1) vSprock.draw();
-        else if(mode == 2) vWall.draw();
-        else if(mode == 3) vGrav.draw();
-        else if(mode == 4) vPartRule.draw();
-        else if(mode == 5) vSkull.draw();
-        else if(mode == 6) vSkullWings.draw();
-        else if(mode == 7) vAngel.draw();
-        else if(mode == 8) vTenticles.draw();
-        else if(mode == 9) vEdges.draw();
+        myVisualizers.get(mode).draw();
+    }
+
+    void add(Visualizer v){
+        myVisualizers.add(v);
+    }
+
+    int getCountOfVisualizers(){
+        return myVisualizers.size();
+    }
+
+    String getNameOfVisualizer(int i){
+        return myVisualizers.get(i).getName();
     }
 
     //transition between modes after each song, maybe we can detect when the song ends by the duration of no beats
     //so we need some counter that will keep track of how long automatically transition to another mode
     void setMode(int i){
-        //clean up any modes that need cleaning up
-        if(i!=mode && mode==9){
-            vEdges.endMode();
-        }
-
+        if(i!=mode) myVisualizers.get(mode).endMode();
+        
         //store the mode
         mode = i;
 
-        //init the new mode
-        if(mode == 1) vSprock.initMode();
-        else if(mode == 2) vWall.initMode();
-        else if(mode == 3) vGrav.initMode();
-        else if(mode == 4) vPartRule.initMode();
-        else if(mode == 5) vSkull.initMode();
-        else if(mode == 6) vSkullWings.initMode();
-        else if(mode == 7) vAngel.initMode();
-        else if(mode == 8) vTenticles.initMode();
-        else if(mode == 9) vEdges.initMode();
+        //initialize the new mode
+        myVisualizers.get(mode).initMode();
     }
 
     void modeTransitioner(){

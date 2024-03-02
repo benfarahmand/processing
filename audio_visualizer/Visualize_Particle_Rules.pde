@@ -1,4 +1,5 @@
-class Visualize_Particle_Rules {
+class Visualize_Particle_Rules implements Visualizer {
+    String NAME = "Connectome";
     float[] y, x, z; //positions
     float[] vx, vy, vz; //velocities
     float[] centerColor;
@@ -31,6 +32,7 @@ class Visualize_Particle_Rules {
         bottomWall = myHeight*0.4;
     }
 
+    @Override
     void draw(){
         pushMatrix();
         cameraTracker();
@@ -294,6 +296,7 @@ class Visualize_Particle_Rules {
         }
     }
 
+    @Override
     void initMode(){
         for(var i = 0 ; i < myFFT.specSize() ; i++){
             x[i] = random(leftWall/2,rightWall/2);
@@ -301,6 +304,9 @@ class Visualize_Particle_Rules {
             z[i] = random(frontWall/4,backWall/4);
         }
     }
+
+    @Override
+    void endMode() {}       
 
     color colorChanger(int i, boolean b) {
         if (b) return color(
@@ -313,5 +319,10 @@ class Visualize_Particle_Rules {
             map(myFFT.getFreq(i), 0, 1024, 100, 0),
             map(myFFT.getBand(i), 0, 512, 100, 0)
             );
+    }
+
+    @Override
+    String getName(){
+        return NAME;
     }
 }

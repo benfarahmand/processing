@@ -1,4 +1,5 @@
-class Visualize_Edges {
+class Visualize_Edges implements Visualizer {
+    String NAME = "Edges";
     FFT myFFT;
     ArrayList<PImage> pastImages;
     int totalHistory = 25;
@@ -16,6 +17,7 @@ class Visualize_Edges {
         // }
     }
     
+    @Override
     void draw() {
         drawPast();
         processEdges();
@@ -31,14 +33,14 @@ class Visualize_Edges {
     void processEdges() {
         opencv.loadImage(video);
         opencv.gray(); // Convert to grayscale
-        opencv.findCannyEdges(110, 250);
+        opencv.findCannyEdges(190, 250);
         //image(opencv.getOutput(), 0, 0, width, height);
     }
     
     void storeHistory() {
         modifyHistoryLength();
         // pastImages[historyTracker] = createMask(opencv.getOutput(), targetColor);
-        pastImages.add(applyMaskAndReplaceColor(opencv.getOutput(), targetColor, this.colorChanger((int) map(historyTracker,0,totalHistory,0,myFFT.specSize()), true)));
+        pastImages.add(applyMaskAndReplaceColorAndFlip(opencv.getOutput(), targetColor, this.colorChanger((int) map(historyTracker,0,totalHistory,0,myFFT.specSize()), true)));
         historyTracker++;
         // println(pastImages.size());
         if (historyTracker >=  totalHistory) {
@@ -92,29 +94,54 @@ class Visualize_Edges {
         result.updatePixels();
         return result;
     }
-        
-        color colorChanger(int i, boolean b) {
-            if (b) return color(
-                map(myFFT.getFreq(i) * speed, 0, 512, 0, 360),
-                map(myFFT.getFreq(i), 0, 1024, 0, 100)+colorScale,
-                map(myFFT.getBand(i), 0, 512, 100, 0)
-               );
-            else return color(
-                map(myFFT.getFreq(i) * speed, 0, 512, 360, 0),
-                map(myFFT.getFreq(i), 0, 1024, 100, 0),
-                map(myFFT.getBand(i), 0, 512, 100, 0)
-               );
+
+    PImage applyMaskAndReplaceColorAndFlip(PImage inputImg, color targetColor, color replacementColor) {
+        PImage result = createImage(inputImg.width, inputImg.height, ARGB);
+        inputImg.loadPixels();
+        result.loadPixels();
+        for (int y = 0; y < inputImg.height; y++) {
+            for (int x = 0; x < inputImg.width; x++) {
+                int i = y * inputImg.width + x;
+                if (inputImg.pixels[i] == targetColor) {
+                    result.pixels[y * inputImg.width + inputImg.width - x - 1]=color(0,0);
+                } else {
+                    result.pixels[y * inputImg.width + inputImg.width - x - 1]=replacementColor;
+                }
+            }
         }
-        
-        
-        void initMode() {
-            historyTracker = 0;
-            video.start();
-            image(video,0,0);
-        }
-        
-        void endMode() {
-            video.stop();
-        }   
+        result.updatePixels();
+        return result;
     }
+        
+    color colorChanger(int i, boolean b) {
+        if (b) return color(
+            map(myFFT.getFreq(i) * speed, 0, 512, 0, 360),
+            map(myFFT.getFreq(i), 0, 1024, 0, 100)+colorScale,
+            map(myFFT.getBand(i), 0, 512, 100, 0)
+            );
+        else return color(
+            map(myFFT.getFreq(i) * speed, 0, 512, 360, 0),
+            map(myFFT.getFreq(i), 0, 1024, 100, 0),
+            map(myFFT.getBand(i), 0, 512, 100, 0)
+            );
+    }
+    
+    @Override
+    void initMode() {
+        println("Starting Edges");
+        historyTracker = 0;
+        video.start();
+        image(video,0,0);
+    }
+    
+    @Override
+    void endMode() {
+        video.stop();
+    }   
+
+    @Override
+    String getName(){
+        return NAME;
+    }
+}
         

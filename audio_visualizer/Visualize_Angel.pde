@@ -3,7 +3,8 @@
 //https://github.com/adafruit/Adafruit_Learning_System_Guides/tree/main/M4_Eyes
 
 
-class Visualize_Angel {
+class Visualize_Angel implements Visualizer {
+    String NAME = "Angel";
     FFT myFFT;
     float[] angle, freq, band, wingAngles, wingFreq, wingBands;
     float[] eyeLookX, eyeLookY;
@@ -77,6 +78,7 @@ class Visualize_Angel {
         if(stillOverlapping && spaceCounter>0) spaceCircles(spaceCounter); //this shouldn't take more than a second or two
     }
 
+    @Override
     void draw(){
         noStroke();
         pushMatrix();
@@ -173,8 +175,17 @@ class Visualize_Angel {
         popMatrix();
     }
 
+    @Override
     void initMode(){
         //init not required, continue straight to draw
         //place holder in case we want to add some init animation
+    }
+
+    @Override
+    void endMode() {}   
+
+    @Override
+    String getName(){
+        return NAME;
     }
 }
