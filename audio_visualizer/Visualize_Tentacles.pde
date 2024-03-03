@@ -104,19 +104,19 @@ class Visualize_Tentacles implements Visualizer {
     }
 
     
-
-    // color colorChanger(int i, boolean b) {
-    //     if (b) return color(
-    //         map(myFFT.getFreq(i)*speed, 0, 512, 0, 360),
-    //         map(myFFT.getFreq(i), 0, 1024, 0, 100)+colorScale,
-    //         100.0
-    //         );
-    //     else return color(
-    //         map(myFFT.getFreq(i)*speed, 0, 512, 360, 0),
-    //         map(myFFT.getFreq(i), 0, 1024, 100, 0),
-    //         map(myFFT.getBand(i), 0, 512, 100, 0)
-    //         );
-    // }
+    @Override
+    color colorChanger(int i, boolean b) {
+        if (b) return color(
+            map(myFFT.getFreq(i)*speed, 0, 512, 0, 360),
+            map(myFFT.getFreq(i), 0, 1024, 0, 100)+colorScale,
+            100.0
+            );
+        else return color(
+            map(myFFT.getFreq(i)*speed, 0, 512, 360, 0),
+            map(myFFT.getFreq(i), 0, 1024, 100, 0),
+            map(myFFT.getBand(i), 0, 512, 100, 0)
+            );
+    }
 
     @Override
     void initMode(){

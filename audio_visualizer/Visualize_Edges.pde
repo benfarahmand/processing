@@ -112,7 +112,8 @@ class Visualize_Edges implements Visualizer {
         result.updatePixels();
         return result;
     }
-        
+    
+    @Override
     color colorChanger(int i, boolean b) {
         if (b) return color(
             map(myFFT.getFreq(i) * speed, 0, 512, 0, 360),
@@ -131,6 +132,7 @@ class Visualize_Edges implements Visualizer {
         println("Starting Edges");
         historyTracker = 0;
         video.start();
+        image(video,0,0);
         image(video,0,0);
     }
     

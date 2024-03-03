@@ -14,7 +14,7 @@ BeatCounter bpm;
 Capture video;
 OpenCV opencv;
 
-Second_Screen screen2;
+Control_Screen control_screen;
 
 float sizeScale = 1.0, colorScale = 1.0;
 float speed = 1.0;
@@ -48,7 +48,7 @@ void setup()
   mt.add(new Visualize_Edges(fft));
   mt.add(new Visualize_Glitchy_Edges(fft));
   colorMode(HSB, 360.0, 100.0, 100.0, 1.0);
-  screen2 = new Second_Screen();
+  control_screen = new Control_Screen();
   // frameRate(60);
 }
 

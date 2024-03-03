@@ -3,4 +3,5 @@ interface Visualizer {
     void initMode();
     void endMode();
     String getName();
+    color colorChanger(int i, boolean b);
 }

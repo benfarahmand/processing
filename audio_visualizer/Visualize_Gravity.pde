@@ -130,6 +130,7 @@ class Visualize_Gravity implements Visualizer {
     @Override
     void endMode() {}   
 
+    @Override
     color colorChanger(int i, boolean b) {
         if (b) return color(
             map(myFFT.getFreq(i)*speed, 0, 512, 0, 360),

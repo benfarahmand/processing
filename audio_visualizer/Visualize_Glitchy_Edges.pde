@@ -122,7 +122,8 @@ class Visualize_Glitchy_Edges implements Visualizer {
             vz[j] = (vz[j] + fz)*0.85;
         }
     }
-        
+    
+    @Override
     color colorChanger(int i, boolean b) {
         if (b) return color(
             map(myFFT.getFreq(i) * speed, 0, 512, 0, 360),
@@ -140,6 +141,7 @@ class Visualize_Glitchy_Edges implements Visualizer {
     void initMode() {
         println("Starting Glitchy Edges");
         video.start();
+        image(video,0,0);
         image(video,0,0);
     }
     

@@ -14,7 +14,11 @@ class Mode_Tracker {
     }
 
     void draw(){
-        myVisualizers.get(mode).draw();
+        try {
+            myVisualizers.get(mode).draw();
+        } catch (Exception e){
+            println(e.toString());
+        }
     }
 
     void add(Visualizer v){
@@ -32,13 +36,16 @@ class Mode_Tracker {
     //transition between modes after each song, maybe we can detect when the song ends by the duration of no beats
     //so we need some counter that will keep track of how long automatically transition to another mode
     void setMode(int i){
-        if(i!=mode) myVisualizers.get(mode).endMode();
+        if(i!=mode) {
+            //end and clean up the previous visualizer
+            myVisualizers.get(mode).endMode();
         
-        //store the mode
-        mode = i;
+            //store the mode
+            mode = i;
 
-        //initialize the new mode
-        myVisualizers.get(mode).initMode();
+            //initialize the new mode
+            myVisualizers.get(mode).initMode();
+        }
     }
 
     void modeTransitioner(){

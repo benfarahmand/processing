@@ -58,6 +58,7 @@ class Visualize_Wall implements Visualizer {
         popMatrix();
     }
 
+    @Override
     color colorChanger(int i, boolean b) {
         if (b) return color(
             map(myFFT.getFreq(i)*speed, 0, 512, 0, 360),

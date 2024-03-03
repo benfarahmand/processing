@@ -349,7 +349,8 @@ class Visualize_Edges_with_Particles implements Visualizer {
             vz[j] = (vz[j] + fz)*0.85;
         }
     }
-        
+    
+    @Override
     color colorChanger(int i, boolean b) {
         if (b) return color(
             map(myFFT.getFreq(i) * speed, 0, 512, 0, 360),
